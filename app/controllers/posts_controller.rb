@@ -26,6 +26,19 @@ class PostsController < ApplicationController
     redirect_to post_path, id: @post.id
   end
 
+  def destroy
+    @post = Post.find(params[:id])
+    if current_user.role == "admin"
+      @post.destroy
+      redirect_to posts_path, :flash => { :message => "Post #{@post.id} has been deleted."}
+    elsif @post.user_id == current_user.id
+      @post.destroy
+      redirect_to posts_path, :flash => { :message => "Post #{@post.id} has been deleted."}
+    else
+      redirect_to post_path(@post), :flash => { :error => "You cannot delete this post."}
+    end
+  end
+
   private
 
   def authorize_user!
